@@ -16,14 +16,20 @@ const CompoundingCalculator: React.FC = () => {
         interestRate: 3,
         compoundingPeriod: 'yearly',
         contributionAmount: 100,
-        contributionFrequency: 'yearly', // Initialize to "none"
+        contributionFrequency: 'monthly', // Initialize to "monthly"
         numberOfMonths: 12,
     });
     const [calculatedValue, setCalculatedValue] = useState<number | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        setInput({ ...input, [e.target.name]: parseFloat(e.target.value) || 0 }); // Handle empty strings
+        let inputValue =e.target.value;
+        if(/^0\d+/.test(inputValue)){
+            inputValue = inputValue.replace(/^0+/,'');
+        }
+        console.log(inputValue);
+        e.target.value = inputValue;
+        setInput({ ...input, [e.target.name]: parseFloat(inputValue) || 0 }); // Handle empty strings
     };
 
     const handleFrequencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -33,11 +39,6 @@ const CompoundingCalculator: React.FC = () => {
     const handlePeriodChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setInput({ ...input, compoundingPeriod: e.target.value as 'yearly' | 'monthly' | 'weekly' });
     }
-
-    const handleClick = (event: React.MouseEvent<HTMLInputElement, MouseEvent>): void => {
-        setInput({ ...input, [event.currentTarget.name]: undefined });
-    }
-
 
     const calculateCompoundInterest = () => {
         // 1. Input Validation
@@ -76,7 +77,7 @@ const CompoundingCalculator: React.FC = () => {
                 {/* Input Fields */}
                 <div>
                     <label htmlFor="initialInvestment" className="block text-gray-700 font-bold mb-2">Initial Investment:</label>
-                    <input type="number" id="initialInvestment" name="initialInvestment" value={input.initialInvestment} onClick={handleClick} onChange={handleChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+                    <input type="number" id="initialInvestment" name="initialInvestment" value={input.initialInvestment} onChange={handleChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
                 </div>
 
                 <div>
