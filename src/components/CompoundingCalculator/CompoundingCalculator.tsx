@@ -71,7 +71,7 @@ const CompoundingCalculator: React.FC = () => {
 
 
     return (
-        <div className="container mx-auto p-4 border-2">
+        <div className="container mx-auto p-4 border-1 bg-muted-1/50 rounded-lg shadow-md"> {/* Container for better layout */}
             <h2 className="text-2xl font-bold mb-4">Compound Interest Calculator</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4"> {/* Grid for better layout */}
                 {/* Input Fields */}
@@ -119,7 +119,7 @@ const CompoundingCalculator: React.FC = () => {
             {errorMessage && <p className="text-red-500 mt-2">{errorMessage}</p>}
             {calculatedValue !== null && (
                 <div className="mt-6 border-t pt-4">
-                    <p className="font-bold">Investment Value: {calculatedValue.toFixed(2)}</p>
+                    <p className="font-bold">Investment Value after : {calculatedValue.toFixed(2)}</p>
                 </div>
             )}
         </div>
