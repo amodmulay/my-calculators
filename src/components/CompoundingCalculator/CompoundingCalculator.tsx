@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from "../ui/button";
+import { CompoundChart } from './CompoundChart';
 
 interface CompoundingInput {
     initialInvestment: number;
@@ -21,6 +22,7 @@ const CompoundingCalculator: React.FC = () => {
     });
     const [calculatedValue, setCalculatedValue] = useState<number | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [interest, setInterest] = useState<number | null>(null);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         let inputValue =e.target.value;
@@ -64,8 +66,10 @@ const CompoundingCalculator: React.FC = () => {
             const contributionN = input.contributionFrequency === 'yearly' ? 1 : (input.contributionFrequency === 'monthly' ? 12 : 52);
             futureValue += pmt * (Math.pow(1 + rate / contributionN, contributionN * t) - 1) / (rate / contributionN) * (1 + rate / contributionN);
         }
-
         setCalculatedValue(futureValue);
+        // calculate the interest to be show in the graph
+        let interest = futureValue - principal;
+        setInterest(interest);
     };
 
 
@@ -73,32 +77,16 @@ const CompoundingCalculator: React.FC = () => {
     return (
         <div className="container mx-auto p-4 border-1 bg-muted-1/50 rounded-lg shadow-md"> {/* Container for better layout */}
             <h2 className="text-2xl font-bold mb-4">Compound Interest Calculator</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4"> {/* Grid for better layout */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4"> {/* Grid for better layout */}
                 {/* Input Fields */}
                 <div>
                     <label htmlFor="initialInvestment" className="block text-gray-700 font-bold mb-2">Initial Investment:</label>
                     <input type="number" id="initialInvestment" name="initialInvestment" value={input.initialInvestment} onChange={handleChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
                 </div>
-
                 <div>
                     <label htmlFor="interestRate" className="block text-gray-700 font-bold mb-2">Interest Rate (%):</label>
                     <input type="number" id="interestRate" name="interestRate" value={input.interestRate} onChange={handleChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
                 </div>
-
-                <div>
-                    <label htmlFor="contributionFrequency" className="block text-gray-700 font-bold mb-2">Contribution Frequency:</label>
-                    <select id="contributionFrequency" name="contributionFrequency" value={input.contributionFrequency} onChange={handleFrequencyChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                        <option value="none">None</option>
-                        <option value="yearly">Yearly</option>
-                        <option value="monthly">Monthly</option>
-                        <option value="weekly">Weekly</option>
-                    </select>
-                </div>
-                <div>
-                    <label htmlFor="contributionAmount" className="block text-gray-700 font-bold mb-2">Contribution Amount:</label>
-                    <input type="number" id="contributionAmount" name="contributionAmount" value={input.contributionAmount} onChange={handleChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
-                </div>
-
                 <div>
                     <label htmlFor="compoundingPeriod" className="block text-gray-700 font-bold mb-2">Compounding Period:</label>
                     <select id="compoundingPeriod" name="compoundingPeriod" value={input.compoundingPeriod} onChange={handlePeriodChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
@@ -108,9 +96,24 @@ const CompoundingCalculator: React.FC = () => {
                     </select>
                 </div>
                 <div>
-                    <label htmlFor="numberOfMonths" className="block text-gray-700 font-bold mb-2">Number of Months:</label>
+                    <label htmlFor="contributionAmount" className="block text-gray-700 font-bold mb-2">Additional Contribution:</label>
+                    <input type="number" id="contributionAmount" name="contributionAmount" value={input.contributionAmount} onChange={handleChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+                </div>
+                <div>
+                    <label htmlFor="contributionFrequency" className="block text-gray-700 font-bold mb-2">Contribution Frequency:</label>
+                    <select id="contributionFrequency" name="contributionFrequency" value={input.contributionFrequency} onChange={handleFrequencyChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <option value="none">None</option>
+                        <option value="yearly">Yearly</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="weekly">Weekly</option>
+                    </select>
+                </div>
+  
+                <div>
+                    <label htmlFor="numberOfMonths" className="block text-gray-700 font-bold mb-2">Duration in Months:</label>
                     <input type="number" id="numberOfMonths" name="numberOfMonths" value={input.numberOfMonths} onChange={handleChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
                 </div>
+                
             </div>
             <div className='mt-4'>
                 <Button onClick={calculateCompoundInterest} variant="destructive">Calculate</Button>
@@ -118,10 +121,19 @@ const CompoundingCalculator: React.FC = () => {
 
             {errorMessage && <p className="text-red-500 mt-2">{errorMessage}</p>}
             {calculatedValue !== null && (
+                <>
                 <div className="mt-6 border-t pt-4">
                     <p className="font-bold">Investment Value after : {calculatedValue.toFixed(2)}</p>
                 </div>
+                <div className="mt-6 border-t pt-4">
+                <p className="font-bold">Principle : {input.initialInvestment}</p>
+            </div>
+            <div className="mt-6 border-t pt-4">
+                <p className="font-bold">Interest Component : {interest?.toFixed(2)}</p>
+            </div>
+            </>
             )}
+            <CompoundChart/>
         </div>
     );
 };
